@@ -1,4 +1,4 @@
-package com.example.kin.menupicture.Net;
+package com.example.kin.menupicture.net;
 
 import android.content.Context;
 import android.widget.Toast;
