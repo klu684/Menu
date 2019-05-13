@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class ImageResult implements Serializable {
     private String fullUrl;
     private String thumbUrl;
-    private String title;
+    //private String title;
 
     public String getFullUrl() {
         return fullUrl;
@@ -18,14 +18,14 @@ public class ImageResult implements Serializable {
     public String getThumbUrl() {
         return thumbUrl;
     }
-    public String getTitle() {
-        return title;
-    }
+//    public String getTitle() {
+//        return title;
+//    }
 
     public ImageResult(JSONObject json){
         try {
             this.fullUrl = json.getString("link");
-            this.title = json.getString("title");
+//            this.title = json.getString("title");
             this.thumbUrl = json.getJSONObject("image").getString("thumbnailLink");
         }catch (JSONException e){
             e.printStackTrace();

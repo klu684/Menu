@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="toolbarIconColor">#442FFE</color>
+    <color name="link_blue">#4d94ff</color>
+    <color name="black">#000000</color>
+    <color name="grey">#bfbfbf</color>
+    <color name="white">#fff</color>
 </resources>

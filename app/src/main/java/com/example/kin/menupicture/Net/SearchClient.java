@@ -1,10 +1,9 @@
-package com.example.kin.menupicture.net;
+package com.example.kin.menupicture.Net;
 
 import android.content.Context;
 import android.widget.Toast;
 
 import com.example.kin.menupicture.R;
-import com.example.kin.menupicture.models.ImageFilter;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -13,7 +12,7 @@ import java.net.URLEncoder;
 
 public class SearchClient {
     private static final String API_BASE_URL = "https://www.googleapis.com/customsearch/v1?";
-    private static final String API_KEY = "AIzaSyBZLrTfgdkPUiC52I1jorKAP3RuTQUVDYU";
+    private static final String API_KEY = "AIzaSyAcM7NQsbXX331W4s0VJYntkYLTGMxF5Vw";
     private static final String CX_KEY = "018166152475396321462:neztg-w1huk";
     private AsyncHttpClient client;
 

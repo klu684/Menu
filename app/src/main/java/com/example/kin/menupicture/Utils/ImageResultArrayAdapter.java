@@ -1,4 +1,4 @@
-package com.example.kin.menupicture.adapters;
+package com.example.kin.menupicture.Utils;
 
 import android.content.Context;
 import android.text.Html;
@@ -26,13 +26,13 @@ public class ImageResultArrayAdapter extends ArrayAdapter<ImageResult> {
         ImageResult imageResult = getItem(position);
         if (convertView == null){
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.item_image_result, parent, false);
+            convertView = inflater.inflate(R.layout.layout_grid_imageview, parent, false);
         }
-        ImageView ivImage = (ImageView) convertView.findViewById(R.id.ivImage);
+        ImageView ivImage = (ImageView) convertView.findViewById(R.id.gridImageView);
         ivImage.setImageResource(0);
-        TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
+        //TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
 
-        tvTitle.setText(Html.fromHtml(imageResult.getTitle()));
+
         Picasso.with(getContext()).load(imageResult.getThumbUrl()).into(ivImage);
         return convertView;
     }

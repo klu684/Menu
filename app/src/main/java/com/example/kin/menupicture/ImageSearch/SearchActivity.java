@@ -1,13 +1,11 @@
-package com.example.kin.menupicture.fragments;
+package com.example.kin.menupicture.ImageSearch;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.view.LayoutInflater;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.os.Bundle;
-import android.view.ViewGroup;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,21 +13,23 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.kin.menupicture.Dialogs.ImageFilterDialog;
 import com.example.kin.menupicture.R;
-import com.example.kin.menupicture.activities.ImageDisplayActivity;
-import com.example.kin.menupicture.adapters.ImageResultArrayAdapter;
+import com.example.kin.menupicture.Utils.ImageResultArrayAdapter;
+import com.example.kin.menupicture.helpers.BottomNavigationViewHelper;
 import com.example.kin.menupicture.helpers.EndlessScrollListener;
 import com.example.kin.menupicture.models.ImageFilter;
 import com.example.kin.menupicture.models.ImageResult;
-import com.example.kin.menupicture.net.SearchClient;
+import com.example.kin.menupicture.Net.SearchClient;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.loopj.android.http.*;
 
 import org.json.JSONArray;
@@ -39,13 +39,11 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
+public class SearchActivity extends AppCompatActivity {
 
-public class SearchFragment extends Fragment{
-
-    private static int MAX_PAGE = 2;
+    private static int MAX_PAGE = 3;
     EditText etQuery;
     GridView gvResults;
-    Button btnSearch;
     ArrayList<ImageResult> imageResults;
     ImageResultArrayAdapter imageAdapter;
     SearchClient client;
@@ -53,29 +51,40 @@ public class SearchFragment extends Fragment{
     String query;
     ImageFilter imageFilter = new ImageFilter();
 
-    @Override
+    private static final String TAG = "SearchActivity";
+    private static final int ACTIVITY_NUM = 1;
+    private Context mContext = SearchActivity.this;
+
     @Nullable
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
 
-        View v= inflater.inflate(R.layout.fragment_search, container, false);
+        etQuery = (EditText) findViewById(R.id.etQuery);
+        gvResults = (GridView) findViewById(R.id.gvResults);
 
-        etQuery = (EditText) v.findViewById(R.id.etQuery);
-        gvResults = (GridView) v.findViewById(R.id.gvResults);
-        btnSearch = (Button) v.findViewById(R.id.btnSearch);
+        Intent toSearch = getIntent();
+        Bundle myBundle = toSearch.getExtras();
 
-        btnSearch.setOnClickListener(new View.OnClickListener() {
+        String selected= myBundle.getString("onTap");
+        etQuery.setText(selected, TextView.BufferType.EDITABLE);
+
+        etQuery.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View v) {
-                hideSoftKeyboard(v);
-                onImageSearch(1);
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    hideSoftKeyboard(v);
+                    onImageSearch(1);
+                    return true;
+                }
+                return false;
             }
         });
 
         gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(getActivity().getApplicationContext(), ImageDisplayActivity.class);
+                Intent i = new Intent(getApplicationContext(), ImageDisplayActivity.class);
                 ImageResult imageResult = imageResults.get(position);
                 i.putExtra("result", imageResult);
                 startActivity(i);
@@ -92,25 +101,22 @@ public class SearchFragment extends Fragment{
         });
 
         imageResults = new ArrayList<>();
-        imageAdapter = new ImageResultArrayAdapter(this.getContext(), imageResults);
+        imageAdapter = new ImageResultArrayAdapter(this, imageResults);
         gvResults.setAdapter(imageAdapter);
 
-        return v;
+        setupBottomNavigationView();
+
     }
 
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View v= inflater.inflate(R.layout.fragment_search, container, false);
-//
-////        //These line of code goes from one fragment to another fragment
-////        Fragment selectedFragment = new AboutFragment();
-////        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-////                selectedFragment).commit();
-//
-//
-//        return v;
-//    }
+    private void setupBottomNavigationView(){
+        Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
+        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottom_navigation);
+        BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
+        BottomNavigationViewHelper.enableNavigation(mContext, this,bottomNavigationViewEx);
+        Menu menu = bottomNavigationViewEx.getMenu();
+        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+        menuItem.setCheckable(true);
+    }
 
     public void onImageSearch(int start) {
 
@@ -122,7 +128,7 @@ public class SearchFragment extends Fragment{
                 imageAdapter.clear();
 
             if (!query.equals(""))
-                client.getSearch(query, startPage, this.getContext(), new JsonHttpResponseHandler() {
+                client.getSearch(query, startPage, this, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                 try {
@@ -132,7 +138,7 @@ public class SearchFragment extends Fragment{
                                         imageAdapter.addAll(ImageResult.fromJSONArray(imageJsonResults));
                                     }
                                 } catch (JSONException e) {
-                                    Toast.makeText(getActivity().getApplicationContext(), R.string.invalid_data, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), R.string.invalid_data, Toast.LENGTH_SHORT).show();
                                     e.printStackTrace();
                                 }
                             }
@@ -140,15 +146,15 @@ public class SearchFragment extends Fragment{
                             @Override
                             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                                 super.onFailure(statusCode, headers, responseString, throwable);
-                                Toast.makeText(getActivity().getApplicationContext(), R.string.service_unavailable, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), R.string.service_unavailable, Toast.LENGTH_SHORT).show();
                             }
                         }
                 );
             else {
-                Toast.makeText(this.getActivity(), R.string.invalid_query, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.invalid_query, Toast.LENGTH_SHORT).show();
             }
         }else{
-            Toast.makeText(this.getActivity(),R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -158,7 +164,7 @@ public class SearchFragment extends Fragment{
     }
 
     public Boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }

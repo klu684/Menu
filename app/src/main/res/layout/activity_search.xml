@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/querysearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <EditText
+            android:id="@+id/etQuery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btnSearch"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toStartOf="@+id/btnSearch"
+            android:layout_toLeftOf="@+id/btnSearch"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textSize="20sp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="40"
+        android:id="@+id/gvResults"
+        android:layout_below="@id/querysearch"
+        android:numColumns="3"
+        android:gravity="center"
+        android:verticalSpacing="5dp"
+        android:horizontalSpacing="5dp"
+        android:layout_marginTop="2dp"/>
+
+    <!-- bottom navigation -->
+    <include layout="@layout/layout_bottom_navigation_view"/>
+
+</RelativeLayout>
